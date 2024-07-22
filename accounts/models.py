@@ -39,6 +39,44 @@ class CustomUser(AbstractUser):
         return self.email
 
     def save(self, *args, **kwargs):
+        if not self.pk and not CustomUser.objects.exists():
+            # This is the first user, make them a superuser
+            self.is_superuser = True
+            self.is_staff = True
+        
+        if self.pk:
+            # If the user already exists, remove all groups
+            self.groups.clear()
+        
+        super().save(*args, **kwargs)
+        
+        if self.group:
+            # Add the user to the selected group
+            self.groups.add(self.group)
+
+    class Meta:
+        permissions = [
+            ("can_view_superuser_status", "Can view superuser status"),
+        ]
+    username = None
+    email = models.EmailField(_('email address'), unique=True)
+    group = models.ForeignKey(
+        Group,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='custom_users'
+    )
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    objects = CustomUserManager()
+
+    def __str__(self):
+        return self.email
+
+    def save(self, *args, **kwargs):
         if self.pk:
             # If the user already exists, remove all groups
             self.groups.clear()
