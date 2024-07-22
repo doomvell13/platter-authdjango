@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    <h1>Dashboard</h1>
+    <p>Welcome, {{ user.email }}</p>
+    <p>Access Level: {{ user.userprofile.get_access_level_display }}</p>
+
+    {% if user.userprofile.access_level == 'HO' %}
+        <h2>District Offices</h2>
+        <ul>
+            {% for office in district_offices %}
+                <li>{{ office.name }}</li>
+            {% endfor %}
+        </ul>
+        <a href="{% url 'create_district_office' %}">Create District Office</a>
+    {% elif user.userprofile.access_level == 'DO' %}
+        <h2>Branch Locations</h2>
+        <ul>
+            {% for location in branch_locations %}
+                <li>{{ location.name }}</li>
+            {% endfor %}
+        </ul>
+        <a href="{% url 'create_branch_location' %}">Create Branch Location</a>
+    {% endif %}
+{% endblock %}

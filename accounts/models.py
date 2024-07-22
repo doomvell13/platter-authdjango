@@ -1,5 +1,7 @@
-from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+from django.contrib.auth.models import AbstractUser, BaseUserManager, Group
+from django.conf import settings
+from django.utils.translation import gettext_lazy as _  # Add this import
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -19,33 +21,31 @@ class CustomUserManager(BaseUserManager):
 
 class CustomUser(AbstractUser):
     username = None
-    email = models.EmailField(unique=True)
+    email = models.EmailField(_('email address'), unique=True)
+    group = models.ForeignKey(
+        Group,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='custom_users'
+    )
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
 
-# offices/models.py
+    def __str__(self):
+        return self.email
 
-from django.db import models
-from django.conf import settings
-
-class Account(models.Model):
-    name = models.CharField(max_length=100)
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='owned_accounts')
-
-class HeadOffice(models.Model):
-    account = models.OneToOneField(Account, on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
-
-class DistrictOffice(models.Model):
-    head_office = models.ForeignKey(HeadOffice, on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
-
-class BranchLocation(models.Model):
-    district_office = models.ForeignKey(DistrictOffice, on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
+    def save(self, *args, **kwargs):
+        if self.pk:
+            # If the user already exists, remove all groups
+            self.groups.clear()
+        super().save(*args, **kwargs)
+        if self.group:
+            # Add the user to the selected group
+            self.groups.add(self.group)
 
 class UserProfile(models.Model):
     ACCESS_LEVELS = (
@@ -55,7 +55,7 @@ class UserProfile(models.Model):
     )
     
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    account = models.ForeignKey('offices.Account', on_delete=models.CASCADE)
     access_level = models.CharField(max_length=2, choices=ACCESS_LEVELS)
-    district_office = models.ForeignKey(DistrictOffice, on_delete=models.SET_NULL, null=True, blank=True)
-    branch_location = models.ForeignKey(BranchLocation, on_delete=models.SET_NULL, null=True, blank=True)
+    district_office = models.ForeignKey('offices.DistrictOffice', on_delete=models.SET_NULL, null=True, blank=True)
+    branch_location = models.ForeignKey('offices.BranchLocation', on_delete=models.SET_NULL, null=True, blank=True)

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>User List</h2>
+<a href="{% url 'create_user' %}">Create New User</a>
+<ul>
+    {% for user_profile in users %}
+    <li>
+        {{ user_profile.user.email }} - {{ user_profile.get_access_level_display }}
+        <a href="{% url 'edit_user' user_profile.id %}">Edit</a>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}
