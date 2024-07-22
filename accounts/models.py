@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager, Group
 from django.conf import settings
-from django.utils.translation import gettext_lazy as _  # Add this import
+from django.utils.translation import gettext_lazy as _ 
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
