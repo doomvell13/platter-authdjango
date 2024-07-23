@@ -35,6 +35,8 @@ Zonal Manager Access
 Branch Location 
 <img width="1088" alt="Screenshot 2024-07-22 at 5 47 34 PM" src="https://github.com/user-attachments/assets/4aa94828-397d-4241-8e35-cc42a0640b62">
 
+<img width="1065" alt="Screenshot 2024-07-23 at 9 02 39 AM" src="https://github.com/user-attachments/assets/70030726-1813-46b8-9f87-9341fe1bf64f">
+
 District Office
 <img width="1088" alt="Screenshot 2024-07-22 at 5 48 00 PM" src="https://github.com/user-attachments/assets/4df4b46c-cc34-4a44-98f5-8248c9e76fae">
 
